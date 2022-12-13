@@ -63,7 +63,28 @@ fn process(file_path: &str) -> String {
     v.iter().map(|v1| v1.last().unwrap()).collect()
 }
 
+fn process2(file_path: &str) -> String {
+    let contents =
+        fs::read_to_string(file_path).expect(format!("missing file {file_path}").as_str());
+    let (crates, moves) = contents.split_once("\n\n").unwrap();
+
+    let mut v = parse_crates(crates);
+    for (count, from, to) in parse_moves(moves) {
+        let mut tmp = vec![];
+        for _ in 0..count {
+            let c = v[from].pop().unwrap();
+            tmp.push(c);
+        }
+        tmp.iter().rev().for_each(|c| v[to].push(*c))
+    }
+
+    v.iter().map(|v1| v1.last().unwrap()).collect()
+}
+
 fn main() {
     println!("{}", process("./day5/test_data.txt"));
     println!("{}", process("./day5/data.txt"));
+
+    println!("{}", process2("./day5/test_data.txt"));
+    println!("{}", process2("./day5/data.txt"));
 }
